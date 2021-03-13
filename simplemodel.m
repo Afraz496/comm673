@@ -41,3 +41,6 @@ ylabel('$r_t$, risk-free rate','Interpreter','latex')
 
 
 %Bottom Left Panel
+etasigma = normpdf(eta,0.5,1);
+figure('Name','Bottom-Left','NumberTitle','off')
+plot(eta,eta.*etasigma)
