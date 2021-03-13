@@ -55,7 +55,7 @@ qL = 0;
 qH = 10e15;
 
 %At the start eta = 0
-eta = 0.01;
+eta = 0;
 for i = 1:50
     dq = (qL+qH)/2;
     
@@ -87,19 +87,9 @@ for i = 1:50
     
     
     %Run the ode45
-    [eta_q, q] = ode45(@(eta,q) rhs(mu_eta, sigma_eta, mu_q, eta, q), 0:0.01:1, [q dq]);
-    [eta_theta, theta] = ode45(@(eta,theta) rhs(mu_eta, sigma_eta, mu_theta, eta, theta), 0:0.01:1, [theta dtheta]);
+    [eta_q, q] = ode45(@rhs, mu_eta, eta, sigma_eta, mu_q, eta_q, [q, dq]);
+    [eta_theta, theta] = ode45(@rhs, mu_eta, eta, sigma_eta, mu_theta, eta_theta, [theta, dtheta]);
     
     %If integration terminates for reason (1):
-    if q == fminsearch(g_max, 0)
-        qH = dq;
-    elseif dtheta == 0
-        qH = dq;     
-    elseif dq == 0
-        qL = dq;        
-    end
-    
-    if dtheta == 0 && dq == 0
-        eta_optimal = eta_q;
-    end
+    if q = fminsearch(g_max, 0)
 end
