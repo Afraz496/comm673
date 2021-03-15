@@ -50,12 +50,13 @@ g_max = @(x)-f(x);
 iota_range = 0;
 [iota,q] = fminsearch(g,iota_range);
 theta = 1;
-dtheta = -10e-10;
+thetainitial = 1;
+dtheta = -10e10;
 qL = 0;
 qH = 10e15;
-
+dthetainitial = -10e10;
 %At the start eta = 0
-eta = 0.01;
+eta = 0.02;
 for i = 1:50
     dq = (qL+qH)/2;
     
@@ -65,9 +66,9 @@ for i = 1:50
         %solve the horrible quadratic
         c = ((a - asmall)/q)*(theta/dtheta)*(-1/chismall)+2*(dq/q)*eta + (dq/q)^2*eta^2 + eta*sigma^2;
         b = ((a-asmall)/q)*(theta/dtheta)*(2/chismall)*(dq/q)*chismall - 2*(dq/q)^2*chismall*eta - chismall*sigma^2;
-        a = ((a - asmall)/q)*(theta/dtheta)*(-1/chismall)*(dq/q)^2*(chismall^2);
+        aquad = ((a - asmall)/q)*(theta/dtheta)*(-1/chismall)*(dq/q)^2*(chismall^2);
         %only take positive root
-        psi = (-b + sqrt(b^2 - 4*a*c))/(2*a);
+        psi = (-b + sqrt(b^2 - 4*aquad*c))/(2*aquad);
     end
     %Try to find sigma_q (You need this to find everything else first
     sigma_q = (sigma)/(1 - (dq/q)*(chismall*psi - eta)) - sigma;
@@ -87,9 +88,17 @@ for i = 1:50
     
     
     %Run the ode45
-    [eta_q, q] = ode45(@(eta,q) rhs(mu_eta, sigma_eta, mu_q, eta, q), 0:0.01:1, [q dq]);
-    [eta_theta, theta] = ode45(@(eta,theta) rhs(mu_eta, sigma_eta, mu_theta, eta, theta), 0:0.01:1, [theta dtheta]);
+    [eta_q, q] = ode45(@(eta,q) rhs(mu_eta, sigma_eta, mu_q, eta, q), 0:0.02:0.98, [q dq]);
+    [eta_theta, theta] = ode45(@(eta,theta) rhs(mu_eta, sigma_eta, mu_theta, eta, theta), 0:0.02:0.98, [thetainitial dthetainitial]);
     
+    dq = q(:,2);
+    q = q(:,1);
+    dtheta = theta(:,2);
+    theta = theta(:,1);
+    dq = dq(i);
+    q = q(i);
+    dtheta = dtheta(i);
+    theta = theta(i);
     %If integration terminates for reason (1):
     if q == fminsearch(g_max, 0)
         qH = dq;
@@ -102,4 +111,6 @@ for i = 1:50
     if dtheta == 0 && dq == 0
         eta_optimal = eta_q;
     end
+    
+    eta = eta + 0.02;
 end
