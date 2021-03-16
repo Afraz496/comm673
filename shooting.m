@@ -44,11 +44,10 @@ f = @(iota)((asmall - iota)/(r - fi(iota) + delta));
 g = @(x)-f(x);
 f_max = @(iota)((a - iota)/(r - fi(iota) + delta));
 g_max = @(x)-f(x);
-%this line searches for the maximum value over the specified interval of
-%iota (we need to constrain iota in the range [0,1] since it's a
-%reinvestment rate so that can only be 0 -> 1.
-iota_range = 0;
+%this line searches for the maximum value over the specified interval
+iota_range = -1/20;
 [iota,q] = fminsearch(g,iota_range);
+q = -1*q;
 theta = 1;
 thetainitial = 1;
 dtheta = -10e10;
@@ -56,7 +55,7 @@ qL = 0;
 qH = 10e15;
 dthetainitial = -10e10;
 %At the start eta = 0
-eta = 0.02;
+eta = 0;
 for i = 1:50
     dq = (qL+qH)/2;
     
@@ -64,11 +63,11 @@ for i = 1:50
         psi = 1;
     else
         %solve the horrible quadratic
-        c = ((a - asmall)/q)*(theta/dtheta)*(-1/chismall)+2*(dq/q)*eta + (dq/q)^2*eta^2 + eta*sigma^2;
-        b = ((a-asmall)/q)*(theta/dtheta)*(2/chismall)*(dq/q)*chismall - 2*(dq/q)^2*chismall*eta - chismall*sigma^2;
-        aquad = ((a - asmall)/q)*(theta/dtheta)*(-1/chismall)*(dq/q)^2*(chismall^2);
+        aquad = (a-asmall)*((dq/q)^2)*chismall^2;
+        b = (a-asmall)*(-2*((dq/q)^2)*eta*chismall - 2*(dq/q)*chismall) + q*(chismall^2)*(dtheta/theta)*sigma^2;
+        c = (a-asmall)*(1+((dq/q)^2)*eta^2 + 2*(dq/q)*eta) - chismall*(dtheta/theta)*eta*(sigma^2)*q;
         %only take positive root
-        psi = (-b + sqrt(b^2 - 4*aquad*c))/(2*aquad);
+        psi = (-b - sqrt(b^2 - 4*aquad*c))/(2*aquad);
     end
     %Try to find sigma_q (You need this to find everything else first
     sigma_q = (sigma)/(1 - (dq/q)*(chismall*psi - eta)) - sigma;
@@ -82,7 +81,7 @@ for i = 1:50
     %Try to find sigma_eta
     sigma_eta = ((chi*psi - eta)/eta)*(sigma + sigma_q);    
     %Try to find mu_q
-    mu_q = chismall*(sigma + sigma_q)*(-sigma_theta)- (a-iota)/q + fi(iota) + delta + r;
+    mu_q = chismall*(sigma + sigma_q)*(-sigma_theta) - sigma*sigma_q - (a-iota)/q + fi(iota) + delta + r;
     %Try to find mu_theta
     mu_theta = rho - r;
     
