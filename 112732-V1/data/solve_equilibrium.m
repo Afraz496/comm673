@@ -17,7 +17,7 @@ tic
 
 global qmax
 
-a = 0.11; a_ = 0.05; rho = 0.06; r = 0.05; sigma = sigmaval; delta = 0.03; delta_ = 0.08;
+a = 0.11; a_ = 0.05; rho = 0.06; r = 0.05; sigma = sigmaval; delta = 0.03; delta_ = 0.08; chibar = chibarval;
 % parameter theta, such that investment iota = Phi + theta Phi^2/2 is
 % required to build capital Phi, is defined in the function investment(q)
 
@@ -73,7 +73,7 @@ options = odeset('RelTol',1e-08,'AbsTol',1e-10, 'events','evntfcn');
         % function 'evntfcn' terminates the integration of the ode 
         % when q exceeds qmax, or f'(eta) or q'(eta) reaches 0 
                                     
-odefun = @(eta,f) fnct(eta, f, r, rho, a, a_, delta, delta_, sigma);
+odefun = @(eta,f) fnct(eta, f, r, rho, a, a_, delta, delta_, sigma, chibar);
 
 QL = 0; QR = 1e+15;
 for iter = 1:50,
@@ -94,7 +94,7 @@ end
 N = length(etaout);
 dynout = zeros(N, 9);
 for n = 1:N,
-    [fp dynout(n,:)] = fnct(etaout(n), fout(n,:), r, rho, a, a_, delta, delta_, sigma);
+    [fp dynout(n,:)] = fnct(etaout(n), fout(n,:), r, rho, a, a_, delta, delta_, sigma, chibar);
 end
 
 

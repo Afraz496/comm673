@@ -1,4 +1,4 @@
-function [fp dyn] = fnct(eta, f, r, rho, a, a_, delta, delta_, sigma)
+function [fp dyn] = fnct(eta, f, r, rho, a, a_, delta, delta_, sigma, chibar)
 % [fp dyn] = fnct(eta, f, r, rho, a, a_, delta, delta_, sigma)
 % takes scalar eta, a 4x1 vector f = [theta, theta', q, q'], and parameters
 % r, rho, a, a_, delta, delta_, sigma, and computes fp, the derivative of f with
@@ -18,13 +18,13 @@ function [fp dyn] = fnct(eta, f, r, rho, a, a_, delta, delta_, sigma)
 psi_L = eta; psi_R = min(f(3)/f(4) + eta, 1);  
 for n = 1:50,
             psi = (psi_L + psi_R)/2;
-            amplification = 1 - f(4)/f(3)*(psi - eta);
+            amplification = 1 - f(4)/f(3)*(chibar*psi - eta);
             
             % VOLATILITY COMPUTATION
-            sigma_eta_eta = sigma*(psi - eta)/amplification;  % sigma_eta *times* eta
+            sigma_eta_eta = sigma*(chibar*psi - eta)/amplification;  % sigma_eta *times* eta
             sigma_q = sigma_eta_eta*f(4)/f(3); 
             sigma_theta = sigma_eta_eta*f(2)/f(1);
-            risk_premium = - sigma_theta*(sigma + sigma_q);
+            risk_premium = chibar*(- sigma_theta)*(sigma + sigma_q);
             
             household_premium = (a_ - a)/f(3) + delta - delta_ + risk_premium;
                    
@@ -36,17 +36,17 @@ for n = 1:50,
 end
 
 mu_q = r - (a - iota)/f(3) - Phi + delta - sigma*sigma_q + risk_premium;
-mu_eta_eta = -(psi - eta)*(sigma + sigma_q)*(sigma + sigma_q + sigma_theta) + eta*(a - iota)/f(3) + eta*(1 - psi)*(delta_ - delta);
+mu_eta_eta = -(chibar*psi - eta)*(sigma + sigma_q)*(sigma + sigma_q + sigma_theta) + eta*(a - iota)/f(3) + eta*(1 - chibar)*(-sigma_theta)*(sigma+sigma_q);
 qpp = 2*(mu_q*f(3) - f(4)*mu_eta_eta)/sigma_eta_eta^2; 
 thetapp = 2*((rho - r)*f(1) - f(2)*mu_eta_eta)/sigma_eta_eta^2; 
 
 fp = [f(2); thetapp; f(4); qpp];
 
-leverage = psi/eta;
+leverage = (chibar*psi)/eta;
 rk = r + risk_premium;
 r_k = r + household_premium;
 
-dyn = [psi, sigma_eta_eta, sigma_q, mu_eta_eta, mu_q, iota, leverage, rk, r_k];
+dyn = [chibar*psi, sigma_eta_eta, sigma_q, mu_eta_eta, mu_q, iota, leverage, rk, r_k];
 
 
 
