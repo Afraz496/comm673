@@ -7,7 +7,7 @@ The paper we chose to replicate is Brunnermeir and Sannikov (2016) which can be 
 This repository consists of 3 code files:
 
 1. `simplemodel.m`: Replicates the plots on page 16 from Section 2 of the paper
-2. `solve_equilibrium.m`: Implements the Shooting Method which is under Section 3.4 Method 1 (page 27). The full algorithm description can be found on the paper. Using Sannikov (2014) with a modified Investment Function here.
+2. `shootingplots.m`: Implements the Shooting Method which is under Section 3.4 Method 1 (page 27). It also plots the change of sigma.
 3. `plotiterative.m`: Implements the Iterative Method which is under Section 3.5 Method 2 (page 33) on some key parameters of interest.
 
 ## Simple Model
@@ -31,7 +31,7 @@ The full MATLAB script prints the plots in their entirety on page 16.
 
 ## Shooting Method
 
-Our Shooting Method borrows the sample code from Brunnermeir and Sannikov (2014) and modifies their investment function and some other variables to generate the output in Brunnermeir and Sannikov (2016). To run our file navigate to `112732 > data`. The script of interest is `solve_equilibrium.m` and if the MATLAB path is correct, it should run fine.
+Our Shooting Method borrows the sample code from Brunnermeir and Sannikov (2014) and modifies their investment function and some other variables to generate the output in Brunnermeir and Sannikov (2016). To run our file navigate to `112732 > data`. The script of interest is `shootingplots.m` and if the MATLAB path is correct, it should run fine.
 
 ## Iterative Method
 
