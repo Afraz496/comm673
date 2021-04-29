@@ -6,12 +6,18 @@
 %
 % written by Yuliy Sannikov
 
+function [fout, etaout, dynout]= solve_equilibrium(sigmaval,chibarval)
+%This is a functional form of the shooting method from Brunnermeri and
+%Sannikove (2016). 
+%Input: Sigma (volatility), Chibar (skin in the game constraint)
+%Outputs: q, sigma_eta, expert_leverage, sigma_q
+
 tic
 
-color = 'r';
+
 global qmax
 
-a = 0.11; a_ = 0.05; rho = 0.06; r = 0.05; sigma = 0.025; delta = 0.03; delta_ = 0.08;
+a = 0.11; a_ = 0.05; rho = 0.06; r = 0.05; sigma = sigmaval; delta = 0.03; delta_ = 0.08;
 % parameter theta, such that investment iota = Phi + theta Phi^2/2 is
 % required to build capital Phi, is defined in the function investment(q)
 
@@ -91,34 +97,9 @@ for n = 1:N,
     [fp dynout(n,:)] = fnct(etaout(n), fout(n,:), r, rho, a, a_, delta, delta_, sigma);
 end
 
-% normalize theta, to make sure that theta(eta*) = 1
-normalization = fout(N,1);
-fout(:,1:2) = fout(:,1:2)/normalization;
-
-% plot everything
-
-figure(1);
-subplot(2,2,1); hold on
-plot(etaout, fout(:,3), color);   
-xlabel('\eta')
-ylabel('q');
-
-sigma_eta = dynout(1:N-1,2)./etaout(1:N-1);
-subplot(2,2,2); hold on
-plot(etaout(1:N-1), dynout(1:N-1,2), color); 
-xlabel('\eta')
-ylabel('\eta \sigma^{\eta}');
-
-subplot(2,2,3); hold on
-plot(etaout(1:N-1), dynout(1:N-1,7), color);  
-xlabel('\eta')
-ylabel('expert leverage');
-axis([0 1 0 10]);
-
-subplot(2,2,4); hold on
-plot(etaout(1:N-1), dynout(1:N-1,3), color); 
-xlabel('\eta')
-ylabel('\sigma^q');
 
 
+
+
+end
 
